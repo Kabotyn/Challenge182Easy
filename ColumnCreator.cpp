@@ -7,13 +7,23 @@
 
 using namespace std;
 
-// constructor, reads file;
-ColumnCreator::ColumnCreator(string file) {
-	file_path = file;
+// constructor with one param - without saving output into file
+ColumnCreator::ColumnCreator(string in_file) {
+	file_path = in_file;
 	input_file.open(file_path.c_str(), fstream::in); // open file for reading
 	readParamsFromFile();
 	split2ColumnLine();
 	creatColumns();
+}
+
+// constructor, reads file; constructor with two params
+ColumnCreator::ColumnCreator(string in_file, string out_file) {
+	file_path = in_file;
+	input_file.open(file_path.c_str(), fstream::in); // open file for reading
+	readParamsFromFile();
+	split2ColumnLine();
+	creatColumns();
+	save2File(out_file);
 }
 
 
@@ -66,6 +76,9 @@ void ColumnCreator::split2ColumnLine() {
 			whole_file += " "; // add space in the ond of line;
 		} 
 	}
+	
+	// close file with input data
+	input_file.close();
 		
 	size_t found = 0;
 	size_t prev_found = -1;
@@ -132,6 +145,25 @@ void ColumnCreator::creatColumns(void) {
 		columns += "\n";
 	}
 	
-	cout << columns;
+	cout << columns; // print on screen ready columns
 }
 
+
+// save ready columns to file
+void ColumnCreator::save2File(std::string output_filename) {
+	output_file.open(output_filename.c_str()); // open file for output data
+	output_file << columns; // save to file
+}
+
+
+ColumnCreator::~ColumnCreator(void) {
+	// if input file is open than close it
+	if(input_file.is_open() == true) {
+		input_file.close();
+	}
+	
+	// like above but output file
+	if(output_file.is_open() == true) {
+		output_file.close();
+	}
+}
